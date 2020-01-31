@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import Bar from "./bar.js";
+import './Sorter.css';
+
 
 export default class Sorter extends Component {
   state = {
@@ -16,6 +18,18 @@ export default class Sorter extends Component {
   sleep = ms => {
     return new Promise(resolve => setTimeout(resolve, ms));
   };
+
+  setColor = (i, color) => {
+      let a = this.state.thisArray;
+      a[i].color = color;
+      this.setState({
+          thisArray: a
+      });
+
+      return this.sleep(2).then(() => {
+
+      });
+  }
 
   setColorTwo = (i, j, color) => {
     let a = this.state.thisArray;
@@ -37,6 +51,42 @@ export default class Sorter extends Component {
     this.setState({
         thisArray: a
     });
+  }
+
+  selectionSort = async () => {
+    let a = this.state.thisArray;
+
+    for(let i = 0; i < a.length - 1; i++){
+        let min = i;
+        
+        for(let j = i + 1; j < a.length; j++){
+            await this.setColorTwo(min, j, 'blue');
+
+            if(a[j].num < a[min].num){
+                a[min].color = 'black';
+                this.setState({
+                    thisArray: a
+                });
+                min = j;
+                await this.setColor(min, 'red');
+            }
+            a[min].color = 'black';
+            a[j].color = 'black';
+            this.setState({
+                thisArray: a
+            })
+        }
+
+        let temp = a[i];
+        a[i] = a[min];
+        a[min] = temp;
+    }
+
+    this.setState({
+        thisArray: a
+    })
+
+    this.setColorAll('green');
   }
 
   bubbleSort = async () => {
@@ -86,7 +136,8 @@ export default class Sorter extends Component {
           return <Bar color={num.color} num={num.num} />;
         })}
         <div>
-          <button onClick={this.bubbleSort}>click me</button>
+          <button onClick={this.selectionSort}>selection</button>
+          <button onClick={this.bubbleSort}>bubble</button>
           <button onClick={this.generateArray}>generate</button>
         </div>
       </div>
