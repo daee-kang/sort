@@ -1,9 +1,10 @@
 import React, { Component } from "react";
 import Bar from "./bar.js";
-import './Sorter.css';
-
+import "./Sorter.css";
 
 export default class Sorter extends Component {
+  speed = 1;
+
   state = {
     thisArray: [
       { num: 5, color: "black" },
@@ -20,16 +21,14 @@ export default class Sorter extends Component {
   };
 
   setColor = (i, color) => {
-      let a = this.state.thisArray;
-      a[i].color = color;
-      this.setState({
-          thisArray: a
-      });
+    let a = this.state.thisArray;
+    a[i].color = color;
+    this.setState({
+      thisArray: a
+    });
 
-      return this.sleep(2).then(() => {
-
-      });
-  }
+    return this.sleep(this.speed).then(() => {});
+  };
 
   setColorTwo = (i, j, color) => {
     let a = this.state.thisArray;
@@ -38,56 +37,54 @@ export default class Sorter extends Component {
     this.setState({
       thisArray: a
     });
-    return this.sleep(2).then(() => {
-
-    });
+    return this.sleep(this.speed).then(() => {});
   };
 
-  setColorAll = (color) => {
+  setColorAll = color => {
     let a = this.state.thisArray;
     a.map(num => {
-        num.color = 'green'
+      num.color = "green";
     });
     this.setState({
-        thisArray: a
+      thisArray: a
     });
-  }
+  };
 
   selectionSort = async () => {
     let a = this.state.thisArray;
 
-    for(let i = 0; i < a.length - 1; i++){
-        let min = i;
-        
-        for(let j = i + 1; j < a.length; j++){
-            await this.setColorTwo(min, j, 'blue');
+    for (let i = 0; i < a.length - 1; i++) {
+      let min = i;
 
-            if(a[j].num < a[min].num){
-                a[min].color = 'black';
-                this.setState({
-                    thisArray: a
-                });
-                min = j;
-                await this.setColor(min, 'red');
-            }
-            a[min].color = 'black';
-            a[j].color = 'black';
-            this.setState({
-                thisArray: a
-            })
+      for (let j = i + 1; j < a.length; j++) {
+        if (a[j].num < a[min].num) {
+          a[min].color = "black";
+          this.setState({
+            thisArray: a
+          });
+          min = j;
+          await this.setColor(min, "red");
+        } else {
+          await this.setColorTwo(min, j, "blue");
         }
+        a[min].color = "black";
+        a[j].color = "black";
+        this.setState({
+          thisArray: a
+        });
+      }
 
-        let temp = a[i];
-        a[i] = a[min];
-        a[min] = temp;
+      let temp = a[i];
+      a[i] = a[min];
+      a[min] = temp;
     }
 
     this.setState({
-        thisArray: a
-    })
+      thisArray: a
+    });
 
-    this.setColorAll('green');
-  }
+    this.setColorAll("green");
+  };
 
   bubbleSort = async () => {
     let a = this.state.thisArray;
@@ -96,38 +93,44 @@ export default class Sorter extends Component {
     while (swapped) {
       swapped = false;
       for (let i = 0, j = 1; j < a.length; i++, j++) {
-        await this.setColorTwo(i, j, "blue");
         if (a[j].num < a[i].num) {
           let temp = a[i];
           a[i] = a[j];
           a[j] = temp;
           await this.setColorTwo(i, j, "red");
           swapped = true;
+        } else {
+          await this.setColorTwo(i, j, "blue");
         }
-        a[i].color = 'black';
-        a[j].color = 'black';
+        a[i].color = "black";
+        a[j].color = "black";
         this.setState({
-            thisArray: a
-        })
+          thisArray: a
+        });
       }
     }
-    this.setColorAll('green');
+    this.setColorAll("green");
   };
 
-  generateArray = (length) => {
-      let a = [];
+  generateArray = length => {
+    let a = [];
 
-      for(let i = 0; i < 50; i++){
-          a.push({
-              num: Math.floor((Math.random() * 100) + 1),
-              color: 'black'
-          })
-      }
-      
-      this.setState({
-          thisArray: a
-      })
-  }
+    for (let i = 0; i < 50; i++) {
+      a.push({
+        num: Math.floor(Math.random() * 100 + 1),
+        color: "black"
+      });
+    }
+
+    this.setState({
+      thisArray: a
+    });
+  };
+
+  //TO-DO
+  changeSpeed = event => {
+    this.speed = event.target.value;
+  };
 
   render() {
     return (
