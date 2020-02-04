@@ -1,11 +1,17 @@
 import React, { Component } from "react";
 import Bar from "./bar.js";
 import "./Sorter.css";
+import HeaderButton from "./headerbutton.js";
 
 export default class Sorter extends Component {
   speed = 1;
 
   state = {
+    sorts: [
+      "bubble",
+      "selection"
+    ],
+    selectedSort: "bubble",
     thisArray: [
       { num: 5, color: "black" },
       { num: 2, color: "black" },
@@ -13,7 +19,7 @@ export default class Sorter extends Component {
       { num: 6, color: "black" },
       { num: 2, color: "black" },
       { num: 1, color: "black" }
-    ]
+    ], 
   };
 
   sleep = ms => {
@@ -49,6 +55,8 @@ export default class Sorter extends Component {
       thisArray: a
     });
   };
+
+  //SORTS//
 
   selectionSort = async () => {
     let a = this.state.thisArray;
@@ -132,15 +140,22 @@ export default class Sorter extends Component {
     this.speed = event.target.value;
   };
 
+  
+
   render() {
     return (
       <div className="sorter">
+        <div>
+          {this.state.sorts.map((sort, index) => {
+            return <HeaderButton sort={sort} key={'sort' + index} selected={this.state.selectedSort === sort}/>
+          })}
+        </div>
+
         {this.state.thisArray.map((num, index) => {
           return <Bar color={num.color} num={num.num} />;
         })}
         <div>
-          <button onClick={this.selectionSort}>selection</button>
-          <button onClick={this.bubbleSort}>bubble</button>
+          <button onClick={this.selectionSort}>Sort</button>
           <button onClick={this.generateArray}>generate</button>
         </div>
       </div>
