@@ -4,6 +4,12 @@ import "./Sorter.css";
 import HeaderButton from "./headerbutton.js";
 
 export default class Sorter extends Component {
+  constructor(props){
+    super(props);
+
+    this.generateArray();
+  }
+
   speed = 1;
 
   state = {
@@ -12,14 +18,7 @@ export default class Sorter extends Component {
       "selection"
     ],
     selectedSort: "bubble",
-    thisArray: [
-      { num: 5, color: "black" },
-      { num: 2, color: "black" },
-      { num: 7, color: "black" },
-      { num: 6, color: "black" },
-      { num: 2, color: "black" },
-      { num: 1, color: "black" }
-    ], 
+    thisArray: [], 
   };
 
   sleep = ms => {
@@ -140,14 +139,20 @@ export default class Sorter extends Component {
     this.speed = event.target.value;
   };
 
-  
+  menuClickHandler = (e) => {
+    this.setState({
+      selected: e.target.textContent
+    });
+    this.forceUpdate();
+    console.log('sup', this.state.selected)
+  }
 
   render() {
     return (
       <div className="sorter">
         <div>
           {this.state.sorts.map((sort, index) => {
-            return <HeaderButton sort={sort} key={'sort' + index} selected={this.state.selectedSort === sort}/>
+            return <HeaderButton sort={sort} key={'sort' + index} selected={this.state.selectedSort === sort} onclick={(e) => this.menuClickHandler(e)}/>
           })}
         </div>
 

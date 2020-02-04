@@ -8,7 +8,7 @@ const HeaderButton = (props) => {
         backgroundColor: 'white',
         color: 'black',
         border: 'solid 1px black',
-        width: 'px'
+        width: '80px'
     }
 
     if(props.selected){
@@ -17,7 +17,7 @@ const HeaderButton = (props) => {
     }
 
     return(
-        <div style={style}>
+        <div style={style} onClick={(e) => props.onclick(e)}>
             {props.sort}
         </div>
     )
