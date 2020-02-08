@@ -4,6 +4,8 @@ button {
     width: 100px;
     background-color: white;
     border: solid 1px black;
+    font-family: 'Inconsolata', monospace;
+    font-size: 12px;
 }
 
 button:active {

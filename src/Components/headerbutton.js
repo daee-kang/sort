@@ -8,6 +8,7 @@ const HeaderButton = (props) => {
         backgroundColor: 'white',
         color: 'black',
         border: 'solid 1px black',
+        borderTopStyle: 'none',
         width: '80px'
     }
 

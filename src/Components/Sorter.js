@@ -4,10 +4,12 @@ import "./Sorter.css";
 import HeaderButton from "./headerbutton.js";
 
 export default class Sorter extends Component {
-  constructor(props){
-    super(props);
-
+  componentDidMount(){
     this.generateArray();
+    this.setState({
+      selectedSort: this.bubbleSort,
+      selectedMenu: 'bubble',
+    })
   }
 
   speed = 1;
@@ -17,13 +19,16 @@ export default class Sorter extends Component {
       "bubble",
       "selection"
     ],
-    selectedSort: "bubble",
+    selectedSort: undefined,
+    selectedMenu: '',
     thisArray: [], 
   };
 
   sleep = ms => {
     return new Promise(resolve => setTimeout(resolve, ms));
   };
+
+  //COLOR SETS//
 
   setColor = (i, color) => {
     let a = this.state.thisArray;
@@ -48,12 +53,19 @@ export default class Sorter extends Component {
   setColorAll = color => {
     let a = this.state.thisArray;
     a.map(num => {
-      num.color = "green";
+      return num.color = "green";
     });
     this.setState({
       thisArray: a
     });
   };
+
+  verifySort = async () => {
+    let a = this.state.thisArray;
+    for(let i = 0; i < a.length; i++){
+      await this.setColor(i, 'green');
+    }
+  }
 
   //SORTS//
 
@@ -90,7 +102,7 @@ export default class Sorter extends Component {
       thisArray: a
     });
 
-    this.setColorAll("green");
+    this.verifySort();
   };
 
   bubbleSort = async () => {
@@ -116,7 +128,7 @@ export default class Sorter extends Component {
         });
       }
     }
-    this.setColorAll("green");
+    this.verifySort();
   };
 
   generateArray = length => {
@@ -139,12 +151,22 @@ export default class Sorter extends Component {
     this.speed = event.target.value;
   };
 
+  //EVENT HANDLERS//
+
   menuClickHandler = (e) => {
+    let sort;
+    switch(e.target.textContent){
+      case 'bubble': {
+        sort = this.bubbleSort; break;
+      }
+      case 'selection' : {
+        sort = this.selectionSort; break;
+      }
+    }
     this.setState({
-      selected: e.target.textContent
+      selectedSort: sort,
+      selectedMenu: e.target.textContent
     });
-    this.forceUpdate();
-    console.log('sup', this.state.selected)
   }
 
   render() {
@@ -152,17 +174,23 @@ export default class Sorter extends Component {
       <div className="sorter">
         <div>
           {this.state.sorts.map((sort, index) => {
-            return <HeaderButton sort={sort} key={'sort' + index} selected={this.state.selectedSort === sort} onclick={(e) => this.menuClickHandler(e)}/>
+            return <HeaderButton sort={sort} key={`sort${index}`} selected={this.state.selectedMenu === sort} onclick={(e) => this.menuClickHandler(e)}/>
           })}
         </div>
 
         {this.state.thisArray.map((num, index) => {
-          return <Bar color={num.color} num={num.num} />;
+          return <Bar color={num.color} num={num.num} key={`bar${index}`} />;
         })}
         <div>
-          <button onClick={this.selectionSort}>Sort</button>
+          <button onClick={this.state.selectedSort}>sort</button>
           <button onClick={this.generateArray}>generate</button>
         </div>
+        {/*TO-DO: SLIDER
+        <div className="slidecontainer">
+          <input type="range" min="1" max="100" value="50" className="slider" id="myRange"/>
+        </div>
+        */}
+
       </div>
     );
   }
