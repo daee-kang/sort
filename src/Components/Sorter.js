@@ -5,14 +5,12 @@ import HeaderButton from "./headerbutton.js";
 
 export default class Sorter extends Component {
   componentDidMount(){
-    this.generateArray();
+    this.generateArray(50);
     this.setState({
       selectedSort: this.bubbleSort,
       selectedMenu: 'bubble',
     })
   }
-
-  speed = 1;
 
   sorts = [
     "bubble",
@@ -25,6 +23,7 @@ export default class Sorter extends Component {
     selectedSort: undefined,
     selectedMenu: '',
     thisArray: [], 
+    speed: 1
   };
 
   sleep = ms => {
@@ -41,17 +40,18 @@ export default class Sorter extends Component {
     });
 
     if(!notAsync)
-      return this.sleep(this.speed).then(() => {});
+      return this.sleep(this.state.speed).then(() => {});
   };
 
-  setColorTwo = (i, j, color) => {
+  setColorTwo = (i, j, color, notAsync) => {
     let a = this.state.thisArray;
     a[i].color = color;
     a[j].color = color;
     this.setState({
       thisArray: a
     });
-    return this.sleep(this.speed).then(() => {});
+    if(!notAsync)
+      return this.sleep(this.state.speed).then(() => {});
   };
 
   setColorAll = color => {
@@ -97,6 +97,7 @@ export default class Sorter extends Component {
     this.verifySort();
   }
 
+  //TO-DO
   quickSort = async () => {
   };
 
@@ -165,7 +166,7 @@ export default class Sorter extends Component {
   generateArray = length => {
     let a = [];
 
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < length; i++) {
       a.push({
         num: Math.floor(Math.random() * 100 + 1),
         color: "black"
@@ -175,11 +176,6 @@ export default class Sorter extends Component {
     this.setState({
       thisArray: a
     });
-  };
-
-  //TO-DO
-  changeSpeed = event => {
-    this.speed = event.target.value;
   };
 
   //EVENT HANDLERS//
@@ -207,6 +203,17 @@ export default class Sorter extends Component {
     });
   }
 
+  changeSpeedHandler = e => {
+    this.setState({
+      speed: e.target.value
+    })
+    console.log(e.target.value)
+  };
+
+  changeSizeHandler = e => {
+    this.generateArray(e.target.value);
+  }
+
   render() {
     return (
       <div className="sorter">
@@ -216,19 +223,23 @@ export default class Sorter extends Component {
           })}
         </div>
 
+        <div>
+          <button onClick={this.state.selectedSort}>sort</button>
+          <button onClick={() => this.generateArray(this.state.thisArray.length)}>generate</button>
+        </div>
+
+        <div>
+          <span>speed: </span>
+          <input type="range" min="1" max="50" value={this.state.speed} className="slider" onChange={this.changeSpeedHandler}/>
+        </div>
+        <div>
+          <span>n:</span>
+          <input type="range" min="5" max="100" value={this.state.thisArray.length} className="slider" onChange={this.changeSizeHandler}/>
+        </div>
+
         {this.state.thisArray.map((num, index) => {
           return <Bar color={num.color} num={num.num} key={`bar${index}`} />;
         })}
-
-        <div>
-          <button onClick={this.state.selectedSort}>sort</button>
-          <button onClick={this.generateArray}>generate</button>
-        </div>
-        {/*TO-DO: SLIDER
-        <div className="slidecontainer">
-          <input type="range" min="1" max="100" value="50" className="slider" id="myRange"/>
-        </div>
-        */}
 
       </div>
     );
