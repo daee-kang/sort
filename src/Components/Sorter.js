@@ -14,11 +14,14 @@ export default class Sorter extends Component {
 
   speed = 1;
 
+  sorts = [
+    "bubble",
+    "selection",
+    "quick",
+    "insert"
+  ];
+
   state = {
-    sorts: [
-      "bubble",
-      "selection"
-    ],
     selectedSort: undefined,
     selectedMenu: '',
     thisArray: [], 
@@ -30,14 +33,15 @@ export default class Sorter extends Component {
 
   //COLOR SETS//
 
-  setColor = (i, color) => {
+  setColor = (i, color, notAsync) => {
     let a = this.state.thisArray;
     a[i].color = color;
     this.setState({
       thisArray: a
     });
 
-    return this.sleep(this.speed).then(() => {});
+    if(!notAsync)
+      return this.sleep(this.speed).then(() => {});
   };
 
   setColorTwo = (i, j, color) => {
@@ -53,7 +57,7 @@ export default class Sorter extends Component {
   setColorAll = color => {
     let a = this.state.thisArray;
     a.map(num => {
-      return num.color = "green";
+      return num.color = color;
     });
     this.setState({
       thisArray: a
@@ -68,6 +72,33 @@ export default class Sorter extends Component {
   }
 
   //SORTS//
+  insertionSort = async () => {
+    let a = this.state.thisArray;
+
+    for(let i = 1; i < a.length; i++){
+      await this.setColorTwo(i, i - 1, 'blue');
+
+      let k = i;
+      while(k - 1 >= 0 && a[k].num < a[k-1].num){
+        let temp = a[k - 1];
+        a[k - 1] = a[k];
+        a[k] = temp;
+        k--;
+        await this.setColorTwo(k, k + 1, 'red');
+        this.setColorAll('black', true)
+      }
+      this.setColorAll('black', true)
+    }
+
+    this.setState({
+      thisArray: a
+    });
+
+    this.verifySort();
+  }
+
+  quickSort = async () => {
+  };
 
   selectionSort = async () => {
     let a = this.state.thisArray;
@@ -155,12 +186,19 @@ export default class Sorter extends Component {
 
   menuClickHandler = (e) => {
     let sort;
+    // eslint-disable-next-line default-case
     switch(e.target.textContent){
       case 'bubble': {
         sort = this.bubbleSort; break;
       }
       case 'selection' : {
         sort = this.selectionSort; break;
+      }
+      case 'quick' : {
+        sort = this.quickSort; break;
+      }
+      case 'insert' : {
+        sort = this.insertionSort; break;
       }
     }
     this.setState({
@@ -173,7 +211,7 @@ export default class Sorter extends Component {
     return (
       <div className="sorter">
         <div>
-          {this.state.sorts.map((sort, index) => {
+          {this.sorts.map((sort, index) => {
             return <HeaderButton sort={sort} key={`sort${index}`} selected={this.state.selectedMenu === sort} onclick={(e) => this.menuClickHandler(e)}/>
           })}
         </div>
@@ -181,6 +219,7 @@ export default class Sorter extends Component {
         {this.state.thisArray.map((num, index) => {
           return <Bar color={num.color} num={num.num} key={`bar${index}`} />;
         })}
+
         <div>
           <button onClick={this.state.selectedSort}>sort</button>
           <button onClick={this.generateArray}>generate</button>
