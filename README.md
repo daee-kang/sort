@@ -4,6 +4,9 @@ Supports BubbleSort, QuickSort, InsertionSort, SelectionSort.
 
 Generates bar components with dynamic height based on value. Pressing sort will show an animation of .. well sorting the bars. Blue bars signal compared values while red means that a swap has been made. 
 
+check it out
+https://master.d5w72wcawve7f.amplifyapp.com/
+
 
 Everything below was created by Create React App
 ---------------------------------------------
