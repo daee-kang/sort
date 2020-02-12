@@ -77,6 +77,7 @@ export default class Sorter extends Component {
     for(let i = 0; i < a.length; i++){
       await this.setColor(i, 'green');
     }
+    //TO-DO: set phase finished? add reset button maybs
     this.setPhase(this.phases.START);
   }
 
