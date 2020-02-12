@@ -314,6 +314,11 @@ export default class Sorter extends Component {
             return <Bar color={num.color} num={num.num} size={this.state.thisArray.length}key={`bar${index}`} />;
           })}
         </div>
+
+        <div>
+          <br/>
+          made by daee kang :-) please i need a job
+        </div>
       </div>
     );
   }
