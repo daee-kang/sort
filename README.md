@@ -1,3 +1,13 @@
+A website created with react and good 'ole css. 
+
+Supports BubbleSort, QuickSort, InsertionSort, SelectionSort. 
+
+Generates bar components with dynamic height based on value. Pressing sort will show an animation of .. well sorting the bars. Blue bars signal compared values while red means that a swap has been made. 
+
+
+Everything below was created by Create React App
+---------------------------------------------
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
