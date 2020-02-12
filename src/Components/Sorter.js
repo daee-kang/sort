@@ -13,6 +13,12 @@ export default class Sorter extends Component {
     })
   }
 
+  phases = {
+    START: 'start',
+    SORTING: 'sorting',
+    FINISHED: 'finished'
+  }
+
   sorts = [
     "bubble",
     "selection",
@@ -24,14 +30,15 @@ export default class Sorter extends Component {
     selectedSort: undefined,
     selectedMenu: '',
     thisArray: [], 
-    speed: 1
+    speed: 1,
+    phase: this.phases.START
   };
 
   sleep = ms => {
     return new Promise(resolve => setTimeout(resolve, ms));
   };
 
-  //COLOR SETS//
+  //--------------------------------------COLOR SETS//
 
   setColor = (i, color, notAsync = false) => {
     let a = this.state.thisArray;
@@ -70,10 +77,13 @@ export default class Sorter extends Component {
     for(let i = 0; i < a.length; i++){
       await this.setColor(i, 'green');
     }
+    this.setPhase(this.phases.START);
   }
 
-  //SORTS//
+  //------------------------------------------SORTS//
   insertionSort = async () => {
+    this.setPhase(this.phases.SORTING);
+
     let a = this.state.thisArray;
 
     for(let i = 1; i < a.length; i++){
@@ -99,6 +109,8 @@ export default class Sorter extends Component {
   }
 
   quickSort = async () => {
+    this.setPhase(this.phases.SORTING);
+
     //recursive quicksort
     const quickSort = async (a, start, end) => {
       if(start < end){
@@ -152,6 +164,8 @@ export default class Sorter extends Component {
   };
 
   selectionSort = async () => {
+    this.setPhase(this.phases.SORTING);
+
     let a = this.state.thisArray;
 
     for (let i = 0; i < a.length - 1; i++) {
@@ -188,6 +202,8 @@ export default class Sorter extends Component {
   };
 
   bubbleSort = async () => {
+    this.setPhase(this.phases.SORTING);
+
     let a = this.state.thisArray;
 
     let swapped = true;
@@ -213,6 +229,8 @@ export default class Sorter extends Component {
     this.verifySort();
   };
 
+  //-----------------------------------GENERAL TINGZ//
+
   generateArray = length => {
     let a = [];
 
@@ -226,9 +244,17 @@ export default class Sorter extends Component {
     this.setState({
       thisArray: a
     });
+
+    this.setPhase(this.phases.START);
   };
 
-  //EVENT HANDLERS//
+  setPhase = toPhase => {
+    this.setState({
+      phase: toPhase
+    })
+  }
+
+  //----------------------------------EVENT HANDLERS//
 
   menuClickHandler = (e) => {
     let sort;
@@ -264,6 +290,7 @@ export default class Sorter extends Component {
     this.generateArray(e.target.value);
   }
 
+
   render() {
     return (
       <div className="sorter">
@@ -274,11 +301,11 @@ export default class Sorter extends Component {
         </div>
 
         <div>
-          <button onClick={this.state.selectedSort}>sort</button>
-          <button onClick={() => this.generateArray(this.state.thisArray.length)}>generate</button>
+          <button onClick={this.state.selectedSort} disabled={this.state.phase !== this.phases.START}>sort</button>
+          <button onClick={() => this.generateArray(this.state.thisArray.length)} disabled={this.state.phase !== this.phases.START}>randomize</button>
         </div>
 
-        <Slider label="size: " min="1" max="100" value={this.state.thisArray.length} handler={this.changeSizeHandler}/>
+        <Slider label="size: " min="1" max="100" value={this.state.thisArray.length} handler={this.changeSizeHandler} disabled={this.state.phase !== this.phases.START}/>
         <Slider label="delay: " min="1" max="50" value={this.state.speed} handler={this.changeSpeedHandler}/>
 
         {this.state.thisArray.map((num, index) => {
