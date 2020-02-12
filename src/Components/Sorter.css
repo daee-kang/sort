@@ -36,5 +36,9 @@ button:focus {
     width: 15px;
     border-radius: 9px;
     background: black;
-    cursor: pointer;
   }
+
+.bar-container{
+    margin-top: 10vh;
+    margin-bottom: none;
+}

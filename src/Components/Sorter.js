@@ -306,13 +306,14 @@ export default class Sorter extends Component {
           <button onClick={() => this.generateArray(this.state.thisArray.length)} disabled={this.state.phase !== this.phases.START}>randomize</button>
         </div>
 
-        <Slider label="size: " min="1" max="100" value={this.state.thisArray.length} handler={this.changeSizeHandler} disabled={this.state.phase !== this.phases.START}/>
+        <Slider label="size: " min="5" max="200" value={this.state.thisArray.length} handler={this.changeSizeHandler} disabled={this.state.phase !== this.phases.START}/>
         <Slider label="delay: " min="1" max="50" value={this.state.speed} handler={this.changeSpeedHandler}/>
 
-        {this.state.thisArray.map((num, index) => {
-          return <Bar color={num.color} num={num.num} key={`bar${index}`} />;
-        })}
-
+        <div className="bar-container">
+          {this.state.thisArray.map((num, index) => {
+            return <Bar color={num.color} num={num.num} size={this.state.thisArray.length}key={`bar${index}`} />;
+          })}
+        </div>
       </div>
     );
   }
