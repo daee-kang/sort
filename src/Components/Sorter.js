@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import Bar from "./bar.js";
 import "./Sorter.css";
-import HeaderButton from "./headerbutton.js";
+import HeaderButton from "./headerbutton";
+import Slider from './Slider';
 
 export default class Sorter extends Component {
   componentDidMount(){
@@ -15,8 +16,8 @@ export default class Sorter extends Component {
   sorts = [
     "bubble",
     "selection",
+    "insert",
     "quick",
-    "insert"
   ];
 
   state = {
@@ -32,7 +33,7 @@ export default class Sorter extends Component {
 
   //COLOR SETS//
 
-  setColor = (i, color, notAsync) => {
+  setColor = (i, color, notAsync = false) => {
     let a = this.state.thisArray;
     a[i].color = color;
     this.setState({
@@ -43,7 +44,7 @@ export default class Sorter extends Component {
       return this.sleep(this.state.speed).then(() => {});
   };
 
-  setColorTwo = (i, j, color, notAsync) => {
+  setColorTwo = (i, j, color, notAsync = false) => {
     let a = this.state.thisArray;
     a[i].color = color;
     a[j].color = color;
@@ -97,8 +98,57 @@ export default class Sorter extends Component {
     this.verifySort();
   }
 
-  //TO-DO
   quickSort = async () => {
+    //recursive quicksort
+    const quickSort = async (a, start, end) => {
+      if(start < end){
+        let pivot = await partition(a, start, end);
+        await quickSort(a, start, pivot - 1);
+        await quickSort(a, pivot + 1, end);
+      }
+    }
+    //ignore this cluster fuck of setting colors lmao
+    const partition = async (a, start, end) => {
+      let pivot = end;
+      await this.setColor(pivot, 'yellow');
+      let i = start - 1;
+      let j = start;
+      while(j < pivot){
+        await this.setColor(j, 'blue');
+        if(a[j].num > a[pivot].num){
+          this.setColor(j, 'black', true);
+          j++;
+          await this.setColor(j, 'blue');
+        } else {
+          if(i >= 0) this.setColor(i, 'black');
+          i++;
+          await this.setColorTwo(i, j, 'red');
+          let temp = a[j];
+          a[j] = a[i];
+          a[i] = temp;
+          this.setColor(j, 'black');
+          this.setColor(i, 'blue');
+          j++;
+          await this.setColor(j, 'blue');
+        }
+      }
+      await this.setColorTwo(i + 1, pivot, 'red');
+      let temp = a[i + 1];
+      a[i + 1] = a[pivot];
+      a[pivot] = temp;
+      this.setColorAll('black');
+
+      return i + 1;
+    }
+
+    //main runner function
+    let a = this.state.thisArray;
+    await quickSort(a, 0, a.length - 1);
+    this.setState({
+      thisArray: a
+    });
+
+    await this.verifySort();
   };
 
   selectionSort = async () => {
@@ -228,14 +278,8 @@ export default class Sorter extends Component {
           <button onClick={() => this.generateArray(this.state.thisArray.length)}>generate</button>
         </div>
 
-        <div>
-          <span>speed: </span>
-          <input type="range" min="1" max="50" value={this.state.speed} className="slider" onChange={this.changeSpeedHandler}/>
-        </div>
-        <div>
-          <span>n:</span>
-          <input type="range" min="5" max="100" value={this.state.thisArray.length} className="slider" onChange={this.changeSizeHandler}/>
-        </div>
+        <Slider label="size: " min="1" max="100" value={this.state.thisArray.length} handler={this.changeSizeHandler}/>
+        <Slider label="delay: " min="1" max="50" value={this.state.speed} handler={this.changeSpeedHandler}/>
 
         {this.state.thisArray.map((num, index) => {
           return <Bar color={num.color} num={num.num} key={`bar${index}`} />;
