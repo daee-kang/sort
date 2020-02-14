@@ -1,10 +1,12 @@
 import React from 'react';
 
 const Bar = (props) => {
+    let width = (window.innerWidth - window.innerWidth/4)/ props.size; 
+
     let divStyle = {
         backgroundColor: props.color,
-        height: props.num * 6,
-        width: '5px',
+        height: props.num * 5,
+        width: width + 'px',
         display: 'inline-block'
     }
 

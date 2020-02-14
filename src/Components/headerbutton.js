@@ -4,7 +4,6 @@ const HeaderButton = (props) => {
     let style = {
         display: 'inline-block',
         padding: '20px',
-        marginBottom: '20px',
         backgroundColor: 'white',
         color: 'black',
         border: 'solid 1px black',

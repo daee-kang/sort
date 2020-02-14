@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import Bar from "./bar.js";
 import "./Sorter.css";
-import HeaderButton from "./headerbutton.js";
+import HeaderButton from "./headerbutton";
+import Slider from './Slider';
 
 export default class Sorter extends Component {
   componentDidMount(){
@@ -12,27 +13,34 @@ export default class Sorter extends Component {
     })
   }
 
+  phases = {
+    START: 'start',
+    SORTING: 'sorting',
+    FINISHED: 'finished'
+  }
+
   sorts = [
     "bubble",
     "selection",
+    "insert",
     "quick",
-    "insert"
   ];
 
   state = {
     selectedSort: undefined,
     selectedMenu: '',
     thisArray: [], 
-    speed: 1
+    speed: 1,
+    phase: this.phases.START
   };
 
   sleep = ms => {
     return new Promise(resolve => setTimeout(resolve, ms));
   };
 
-  //COLOR SETS//
+  //--------------------------------------COLOR SETS//
 
-  setColor = (i, color, notAsync) => {
+  setColor = (i, color, notAsync = false) => {
     let a = this.state.thisArray;
     a[i].color = color;
     this.setState({
@@ -43,7 +51,7 @@ export default class Sorter extends Component {
       return this.sleep(this.state.speed).then(() => {});
   };
 
-  setColorTwo = (i, j, color, notAsync) => {
+  setColorTwo = (i, j, color, notAsync = false) => {
     let a = this.state.thisArray;
     a[i].color = color;
     a[j].color = color;
@@ -69,10 +77,14 @@ export default class Sorter extends Component {
     for(let i = 0; i < a.length; i++){
       await this.setColor(i, 'green');
     }
+    //TO-DO: set phase finished? add reset button maybs
+    this.setPhase(this.phases.START);
   }
 
-  //SORTS//
+  //------------------------------------------SORTS//
   insertionSort = async () => {
+    this.setPhase(this.phases.SORTING);
+
     let a = this.state.thisArray;
 
     for(let i = 1; i < a.length; i++){
@@ -97,11 +109,64 @@ export default class Sorter extends Component {
     this.verifySort();
   }
 
-  //TO-DO
   quickSort = async () => {
+    this.setPhase(this.phases.SORTING);
+
+    //recursive quicksort
+    const quickSort = async (a, start, end) => {
+      if(start < end){
+        let pivot = await partition(a, start, end);
+        await quickSort(a, start, pivot - 1);
+        await quickSort(a, pivot + 1, end);
+      }
+    }
+    //ignore this cluster fuck of setting colors lmao
+    const partition = async (a, start, end) => {
+      let pivot = end;
+      await this.setColor(pivot, 'yellow');
+      let i = start - 1;
+      let j = start;
+      while(j < pivot){
+        await this.setColor(j, 'blue');
+        if(a[j].num > a[pivot].num){
+          this.setColor(j, 'black', true);
+          j++;
+          await this.setColor(j, 'blue');
+        } else {
+          if(i >= 0) this.setColor(i, 'black');
+          i++;
+          await this.setColorTwo(i, j, 'red');
+          let temp = a[j];
+          a[j] = a[i];
+          a[i] = temp;
+          this.setColor(j, 'black');
+          this.setColor(i, 'blue');
+          j++;
+          await this.setColor(j, 'blue');
+        }
+      }
+      await this.setColorTwo(i + 1, pivot, 'red');
+      let temp = a[i + 1];
+      a[i + 1] = a[pivot];
+      a[pivot] = temp;
+      this.setColorAll('black');
+
+      return i + 1;
+    }
+
+    //main runner function
+    let a = this.state.thisArray;
+    await quickSort(a, 0, a.length - 1);
+    this.setState({
+      thisArray: a
+    });
+
+    await this.verifySort();
   };
 
   selectionSort = async () => {
+    this.setPhase(this.phases.SORTING);
+
     let a = this.state.thisArray;
 
     for (let i = 0; i < a.length - 1; i++) {
@@ -138,6 +203,8 @@ export default class Sorter extends Component {
   };
 
   bubbleSort = async () => {
+    this.setPhase(this.phases.SORTING);
+
     let a = this.state.thisArray;
 
     let swapped = true;
@@ -163,6 +230,8 @@ export default class Sorter extends Component {
     this.verifySort();
   };
 
+  //-----------------------------------GENERAL TINGZ//
+
   generateArray = length => {
     let a = [];
 
@@ -176,9 +245,17 @@ export default class Sorter extends Component {
     this.setState({
       thisArray: a
     });
+
+    this.setPhase(this.phases.START);
   };
 
-  //EVENT HANDLERS//
+  setPhase = toPhase => {
+    this.setState({
+      phase: toPhase
+    })
+  }
+
+  //----------------------------------EVENT HANDLERS//
 
   menuClickHandler = (e) => {
     let sort;
@@ -214,6 +291,7 @@ export default class Sorter extends Component {
     this.generateArray(e.target.value);
   }
 
+
   render() {
     return (
       <div className="sorter">
@@ -224,23 +302,23 @@ export default class Sorter extends Component {
         </div>
 
         <div>
-          <button onClick={this.state.selectedSort}>sort</button>
-          <button onClick={() => this.generateArray(this.state.thisArray.length)}>generate</button>
+          <button onClick={this.state.selectedSort} disabled={this.state.phase !== this.phases.START}>sort</button>
+          <button onClick={() => this.generateArray(this.state.thisArray.length)} disabled={this.state.phase !== this.phases.START}>randomize</button>
+        </div>
+
+        <Slider label="size: " min="5" max="200" value={this.state.thisArray.length} handler={this.changeSizeHandler} disabled={this.state.phase !== this.phases.START}/>
+        <Slider label="delay: " min="1" max="50" value={this.state.speed} handler={this.changeSpeedHandler}/>
+
+        <div className="bar-container">
+          {this.state.thisArray.map((num, index) => {
+            return <Bar color={num.color} num={num.num} size={this.state.thisArray.length}key={`bar${index}`} />;
+          })}
         </div>
 
         <div>
-          <span>speed: </span>
-          <input type="range" min="1" max="50" value={this.state.speed} className="slider" onChange={this.changeSpeedHandler}/>
+          <br/>
+          made by daee kang :-) please i need a job
         </div>
-        <div>
-          <span>n:</span>
-          <input type="range" min="5" max="100" value={this.state.thisArray.length} className="slider" onChange={this.changeSizeHandler}/>
-        </div>
-
-        {this.state.thisArray.map((num, index) => {
-          return <Bar color={num.color} num={num.num} key={`bar${index}`} />;
-        })}
-
       </div>
     );
   }
