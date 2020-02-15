@@ -24,6 +24,7 @@ export default class Sorter extends Component {
     "selection",
     "insert",
     "quick",
+    "radix"
   ];
 
   state = {
@@ -35,7 +36,14 @@ export default class Sorter extends Component {
   };
 
   sleep = ms => {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise(resolve => {
+      if(ms <= 4){
+        setImmediate(resolve, ms)
+      } else {
+        //settimeout only goes up to 4ms, otherwise use H@X 
+        setTimeout(resolve, ms);
+      }
+    });
   };
 
   //--------------------------------------COLOR SETS//
@@ -82,6 +90,10 @@ export default class Sorter extends Component {
   }
 
   //------------------------------------------SORTS//
+  radixSort = async () => {
+
+  }
+
   insertionSort = async () => {
     this.setPhase(this.phases.SORTING);
 
@@ -273,6 +285,9 @@ export default class Sorter extends Component {
       case 'insert' : {
         sort = this.insertionSort; break;
       }
+      case 'radix' : {
+        sort = this.radixSort; break;
+      }
     }
     this.setState({
       selectedSort: sort,
@@ -307,7 +322,7 @@ export default class Sorter extends Component {
         </div>
 
         <Slider label="size: " min="5" max="200" value={this.state.thisArray.length} handler={this.changeSizeHandler} disabled={this.state.phase !== this.phases.START}/>
-        <Slider label="delay: " min="1" max="50" value={this.state.speed} handler={this.changeSpeedHandler}/>
+        <Slider label="delay: " min="0" max="50" value={this.state.speed} handler={this.changeSpeedHandler}/>
 
         <div className="bar-container">
           {this.state.thisArray.map((num, index) => {
